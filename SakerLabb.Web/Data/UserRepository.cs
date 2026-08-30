@@ -59,7 +59,8 @@ public class UserRepository
     {
         using var connection = _db.Open();
         var lookup = connection.CreateCommand();
-        lookup.CommandText = "SELECT SecurityAnswer FROM Users WHERE Username = '" + username + "'";
+        lookup.CommandText = "SELECT SecurityAnswer FROM Users WHERE Username = @Username";
+        lookup.Parameters.AddWithValue("@Username", username);
         var stored = lookup.ExecuteScalar() as string;
 
         if (stored is null || !stored.Equals(securityAnswer, StringComparison.OrdinalIgnoreCase))
@@ -69,7 +70,9 @@ public class UserRepository
 
         var token = CryptoService.GenerateResetToken();
         var update = connection.CreateCommand();
-        update.CommandText = "UPDATE Users SET ResetToken = '" + token + "' WHERE Username = '" + username + "'";
+        update.CommandText = "UPDATE Users SET ResetToken = @Token WHERE Username = @Username";
+        update.Parameters.AddWithValue("@Token", token);
+        update.Parameters.AddWithValue("@Username", username);
         update.ExecuteNonQuery();
 
         return token;

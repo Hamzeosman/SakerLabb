@@ -19,11 +19,11 @@ public class ImportService
     {
         var settings = new XmlReaderSettings
         {
-            DtdProcessing = DtdProcessing.Parse,
-            XmlResolver = new XmlUrlResolver()
+            DtdProcessing = DtdProcessing.Prohibit,
+            XmlResolver = null
         };
 
-        var document = new XmlDocument { XmlResolver = new XmlUrlResolver() };
+        var document = new XmlDocument { XmlResolver = null };
         using var reader = XmlReader.Create(new StringReader(xml), settings);
         document.Load(reader);
 
@@ -49,21 +49,31 @@ public class ImportService
 
     public string Ping(string host)
     {
+        if (string.IsNullOrWhiteSpace(host) || !IsValidHost(host))
+        {
+            throw new ArgumentException("Ogiltigt värde för host.", nameof(host));
+        }
+
         var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
-                FileName = "cmd.exe",
-                Arguments = "/c ping -n 2 " + host,
+                FileName = "ping.exe",
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             }
         };
+        process.StartInfo.ArgumentList.Add("-n");
+        process.StartInfo.ArgumentList.Add("2");
+        process.StartInfo.ArgumentList.Add(host);
 
         process.Start();
         var output = process.StandardOutput.ReadToEnd();
         process.WaitForExit(5000);
         return output;
     }
+
+    private static bool IsValidHost(string host) =>
+        System.Text.RegularExpressions.Regex.IsMatch(host, @"^[a-zA-Z0-9.-]{1,253}$");
 }
