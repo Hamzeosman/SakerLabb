@@ -63,7 +63,7 @@ Plats:       SakerLabb.Web/Services/ImportService.cs, Ping-metoden (tidigare rad
 Bevis före:  ZAP-larm "Remote OS Command Injection", Risk: High, Confidence: Medium. Payload localhost&type %SYSTEMROOT%\win.ini gav [fonts]/[extensions]/... (innehållet i win.ini) i svaret. Se skärmbild, fynd 3.
 Bedömning:   Verkligt (se motivering i tabellen ovan).
 Åtgärd:      Bytte bort cmd.exe /c-skalanropet mot direkt anrop av ping.exe med ProcessStartInfo.ArgumentList (ingen skalparsning av &, |, etc.), samt lade till en allowlist-regex (^[a-zA-Z0-9.-]{1,253}$) för host-parametern. Commit: 30f131d.
-Bevis efter: (Att fylla i) Kör om samma request i ZAP:s Requester-flik mot den ombyggda appen. Förväntat: antingen ett valideringsfel (400/ArgumentException) för payloaden, eller en ren ping-utskrift utan möjlighet att bifoga extra kommandon. Kör därefter om Active Scan och kontrollera att "Remote OS Command Injection" inte längre listas i Alerts.
+Bevis efter: Samma request (GET /diagnostik/ping?host=localhost&type=%SYSTEMROOT%\win.ini) återskickad i ZAP:s Requester mot den ombyggda appen ger nu HTTP 500 med System.ArgumentException: "Ogiltigt värde för host." (Parameter 'host') från ImportService.Ping, rad 54 — payloaden avvisas av allowlist-kontrollen i stället för att läcka win.ini-innehåll. CodeQL-alert #14 ("Uncontrolled command line", samma rad) bekräftar detta ytterligare. Se skärmbild.
 ```
 
 ### Åtgärd 2
