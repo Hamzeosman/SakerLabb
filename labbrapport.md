@@ -74,7 +74,7 @@ Plats:       SakerLabb.Web/Services/ImportService.cs, ImportXml-metoden (tidigar
 Bevis före:  CodeQL-larm #20 "Untrusted XML is read insecurely", Critical, ImportService.cs:27. Se skärmbild, fynd 2.
 Bedömning:   Verkligt.
 Åtgärd:      DtdProcessing.Parse → DtdProcessing.Prohibit, samt XmlResolver satt till null i både XmlReaderSettings och XmlDocument (i stället för new XmlUrlResolver()), vilket blockerar upplösning av externa entiteter/DTD:er. Commit: 30f131d.
-Bevis efter: (Att fylla i) Öppna en pull request från losning-hamze mot main så att CodeQL skannar branchen. Alert #20 ska visas som Fixed/stängd i PR:ens "Code scanning results".
+Bevis efter: CodeQL-alert #20 (https://github.com/Hamzeosman/SakerLabb/security/code-scanning/20) visar nu statusen Fixed på branch main, "Fixed 8 minuter sedan via pull request #3" (merge-commit 323d212). Se skärmbild.
 ```
 
 ### Åtgärd 3
@@ -85,7 +85,7 @@ Plats:       SakerLabb.Web/Data/UserRepository.cs, StartPasswordReset-metoden (t
 Bevis före:  CodeQL-larm #8, High, UserRepository.cs:62. Bekräftat dynamiskt av ZAP: en ' i username-fältet mot /account/reset/start gav en SqliteException med fullständig stacktrace. Se skärmbild, fynd 1.
 Bedömning:   Verkligt.
 Åtgärd:      Bytte de strängsammanslagna frågorna mot parametriserade frågor (@Username, @Token) via SqliteCommand.Parameters.AddWithValue. Commit: b783e17.
-Bevis efter: (Att fylla i) CodeQL-alert #8 ska visas som Fixed i PR:en. Kör dessutom om samma ZAP-request (en ' i username mot /account/reset/start) i Requester-fliken — svaret ska inte längre innehålla en SqliteException/stacktrace.
+Bevis efter: CodeQL-alert #8 (https://github.com/Hamzeosman/SakerLabb/security/code-scanning/8) visar nu statusen Fixed på branch main, "Fixed 8 minuter sedan via pull request #3" (merge-commit 323d212). Se skärmbild. Dynamisk bekräftelse med ZAP (samma request som i "bevis före") görs som komplement.
 ```
 
 ---
